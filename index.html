@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FileFerry — Sell digital downloads without the support tickets</title>
+  <title>FileFerry | Sell digital downloads without the support tickets</title>
   <meta name="description" content="FileFerry delivers your files with secure expiring links, license keys, and automatic fulfillment for Shopify.">
 
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -60,7 +60,7 @@
         <!-- Hero Signup Form -->
         <div class="form-wrapper hero-form-wrapper">
           <form class="signup-form" id="hero-signup-form" novalidate>
-            <input type="hidden" name="selected_plan" id="hero-selected-plan" value="Pro">
+            <input type="hidden" name="selected_plan" id="hero-selected-plan" value="">
             
             <div class="form-fields">
               <div class="form-group field-email">
@@ -88,8 +88,8 @@
                 >
               </div>
 
-              <div class="plan-indicator" id="hero-plan-indicator">
-                Selected plan: <strong class="active-plan-name">Pro</strong> 
+              <div class="plan-indicator" id="hero-plan-indicator" style="display: none;">
+                Selected plan: <strong class="active-plan-name"></strong> 
                 <a href="#pricing" class="change-plan-link">(change)</a>
               </div>
 
@@ -253,7 +253,7 @@
           </div>
 
           <!-- Pro Plan Card -->
-          <div class="card pricing-card plan-selected" id="pricing-card-pro" data-plan="Pro" role="button" tabindex="0" aria-label="Select Pro plan">
+          <div class="card pricing-card" id="pricing-card-pro" data-plan="Pro" role="button" tabindex="0" aria-label="Select Pro plan">
             <div class="pricing-card-header">
               <div class="plan-badge badge-pro">Pro</div>
               <div class="plan-price-wrap">
@@ -285,11 +285,11 @@
             </button>
             <button 
               type="button" 
-              class="picker-btn active" 
+              class="picker-btn" 
               id="picker-btn-pro" 
               data-plan="Pro"
               role="radio"
-              aria-checked="true"
+              aria-checked="false"
             >
               <span class="picker-radio-circle"></span>
               <span class="picker-btn-label">Pro</span>
@@ -340,7 +340,7 @@
 
           <div class="form-wrapper final-form-wrapper">
             <form class="signup-form" id="final-signup-form" novalidate>
-              <input type="hidden" name="selected_plan" id="final-selected-plan" value="Pro">
+              <input type="hidden" name="selected_plan" id="final-selected-plan" value="">
 
               <div class="form-fields">
                 <div class="form-group field-email">
@@ -368,8 +368,8 @@
                   >
                 </div>
 
-                <div class="plan-indicator" id="final-plan-indicator">
-                  Selected plan: <strong class="active-plan-name">Pro</strong> 
+                <div class="plan-indicator" id="final-plan-indicator" style="display: none;">
+                  Selected plan: <strong class="active-plan-name"></strong> 
                   <a href="#pricing" class="change-plan-link">(change)</a>
                 </div>
 
@@ -397,7 +397,7 @@
     <div class="container footer-container">
       <div class="footer-brand">
         <span class="logo-text">FileFerry</span>
-        <span class="footer-sub">— Secure digital delivery for Shopify</span>
+        <span class="footer-sub">| Secure digital delivery for Shopify</span>
       </div>
       <div class="footer-copy">
         &copy; <span id="current-year"></span> FileFerry. All rights reserved.

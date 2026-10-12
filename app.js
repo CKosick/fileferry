@@ -28,8 +28,8 @@ const CONFIG = {
     }
   },
 
-  // Default selected plan on page load
-  DEFAULT_PLAN: "Pro"
+  // Default selected plan on page load (none selected by default)
+  DEFAULT_PLAN: null
 };
 
 // -----------------------------------------------------------------------------
@@ -51,13 +51,14 @@ function trackEvent(eventName, properties = {}) {
 // -----------------------------------------------------------------------------
 // STATE MANAGEMENT
 // -----------------------------------------------------------------------------
-let selectedPlan = CONFIG.DEFAULT_PLAN;
+let selectedPlan = null;
 
 /**
  * Updates selected plan across picker, pricing cards, and forms.
  * @param {'Starter'|'Pro'} plan 
+ * @param {boolean} isUserClick - Only fires tracking on real user interaction
  */
-function setSelectedPlan(plan) {
+function setSelectedPlan(plan, isUserClick = false) {
   if (plan !== "Starter" && plan !== "Pro") return;
   selectedPlan = plan;
 
@@ -97,13 +98,19 @@ function setSelectedPlan(plan) {
   if (heroPlanInput) heroPlanInput.value = plan;
   if (finalPlanInput) finalPlanInput.value = plan;
 
-  // 4. Update visible labels
+  // 4. Update and display plan indicators in forms
   document.querySelectorAll(".active-plan-name").forEach(el => {
     el.textContent = plan;
   });
+  const heroIndicator = document.getElementById("hero-plan-indicator");
+  const finalIndicator = document.getElementById("final-plan-indicator");
+  if (heroIndicator) heroIndicator.style.display = "flex";
+  if (finalIndicator) finalIndicator.style.display = "flex";
 
-  // Track plan pick event
-  trackEvent("plan_selected", { plan });
+  // 5. Fire tracking event ONLY on a real visitor click, never during initialization
+  if (isUserClick) {
+    trackEvent("plan_selected", { plan });
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -116,7 +123,8 @@ async function handleFormSubmit(form, messageEl, submitBtn) {
 
   const email = emailInput ? emailInput.value.trim() : "";
   const storeUrl = storeUrlInput ? storeUrlInput.value.trim() : "";
-  const plan = planInput ? planInput.value : selectedPlan;
+  const planRaw = planInput ? planInput.value.trim() : "";
+  const plan = planRaw || selectedPlan || "None";
 
   // Reset message display
   messageEl.className = "form-message";
@@ -130,7 +138,7 @@ async function handleFormSubmit(form, messageEl, submitBtn) {
     return;
   }
 
-  // Payload with email, optional store URL, and selected plan
+  // Payload with email, optional store URL, and selected plan (recorded as "None" if unpicked)
   const payload = {
     email: email,
     storeUrl: storeUrl || null,
@@ -178,7 +186,11 @@ async function handleFormSubmit(form, messageEl, submitBtn) {
     // Success response
     trackEvent("signup_success", { plan, hasStoreUrl: Boolean(storeUrl) });
     messageEl.className = "form-message success";
-    messageEl.innerHTML = `<strong>You're on the early list for ${plan}!</strong><br>We'll notify you as soon as FileFerry is ready.`;
+    if (plan === "None") {
+      messageEl.innerHTML = `<strong>You're on the early list!</strong><br>We'll notify you as soon as FileFerry is ready.`;
+    } else {
+      messageEl.innerHTML = `<strong>You're on the early list for ${plan}!</strong><br>We'll notify you as soon as FileFerry is ready.`;
+    }
     
     // Clear inputs
     if (emailInput) emailInput.value = "";
@@ -223,37 +235,36 @@ document.addEventListener("DOMContentLoaded", () => {
     featuresPro.textContent = CONFIG.PRICING.pro.features;
   }
 
-  // Initialize selected plan
-  setSelectedPlan(CONFIG.DEFAULT_PLAN);
+  // NOTE: On page load, neither plan is selected by default for measurement integrity.
 
-  // Setup Plan Picker Buttons under Pricing
+  // Setup Plan Picker Buttons under Pricing (tracks plan_selected on visitor click)
   const pickerStarter = document.getElementById("picker-btn-starter");
   const pickerPro = document.getElementById("picker-btn-pro");
   if (pickerStarter) {
-    pickerStarter.addEventListener("click", () => setSelectedPlan("Starter"));
+    pickerStarter.addEventListener("click", () => setSelectedPlan("Starter", true));
   }
   if (pickerPro) {
-    pickerPro.addEventListener("click", () => setSelectedPlan("Pro"));
+    pickerPro.addEventListener("click", () => setSelectedPlan("Pro", true));
   }
 
-  // Setup Pricing Cards Click/Keyboard Selection
+  // Setup Pricing Cards Click/Keyboard Selection (tracks plan_selected on visitor click)
   const starterCard = document.getElementById("pricing-card-starter");
   const proCard = document.getElementById("pricing-card-pro");
   if (starterCard) {
-    starterCard.addEventListener("click", () => setSelectedPlan("Starter"));
+    starterCard.addEventListener("click", () => setSelectedPlan("Starter", true));
     starterCard.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        setSelectedPlan("Starter");
+        setSelectedPlan("Starter", true);
       }
     });
   }
   if (proCard) {
-    proCard.addEventListener("click", () => setSelectedPlan("Pro"));
+    proCard.addEventListener("click", () => setSelectedPlan("Pro", true));
     proCard.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        setSelectedPlan("Pro");
+        setSelectedPlan("Pro", true);
       }
     });
   }
