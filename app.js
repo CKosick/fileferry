@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 const CONFIG = {
   // TODO: Set your form submission endpoint URL here (e.g. Formspree, Loops, ConvertKit, Zapier webhook)
-  FORM_ENDPOINT: "", 
+  FORM_ENDPOINT: "https://formspree.io/f/xdealjbo", 
 
   // TODO: Set your analytics tracking ID or snippet hook here (e.g. Plausible, PostHog, Google Analytics)
   ANALYTICS_ID: "", 
