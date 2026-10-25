@@ -49,9 +49,46 @@ function trackEvent(eventName, properties = {}) {
 }
 
 // -----------------------------------------------------------------------------
+// CAMPAIGN ATTRIBUTION HELPERS
+// -----------------------------------------------------------------------------
+function sanitizeCampaignParam(value) {
+  if (!value) return null;
+  const sanitized = value
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, "")
+    .slice(0, 80);
+  return sanitized.length > 0 ? sanitized : null;
+}
+
+function parseCampaignParams() {
+  try {
+    const search = typeof window !== "undefined" && window.location ? window.location.search : "";
+    const params = new URLSearchParams(search);
+    const utmSource = sanitizeCampaignParam(params.get("utm_source"));
+    const utmMedium = sanitizeCampaignParam(params.get("utm_medium"));
+    const utmCampaign = sanitizeCampaignParam(params.get("utm_campaign"));
+
+    return {
+      source: utmSource || "direct",
+      utm_source: utmSource,
+      utm_medium: utmMedium,
+      utm_campaign: utmCampaign
+    };
+  } catch (e) {
+    return {
+      source: "direct",
+      utm_source: null,
+      utm_medium: null,
+      utm_campaign: null
+    };
+  }
+}
+
+// -----------------------------------------------------------------------------
 // STATE MANAGEMENT
 // -----------------------------------------------------------------------------
 let selectedPlan = null;
+const campaignParams = parseCampaignParams();
 
 /**
  * Updates selected plan across picker, pricing cards, and forms.
@@ -138,11 +175,15 @@ async function handleFormSubmit(form, messageEl, submitBtn) {
     return;
   }
 
-  // Payload with email, optional store URL, and selected plan (recorded as "None" if unpicked)
+  // Payload with email, optional store URL, selected plan, and campaign attribution
   const payload = {
     email: email,
     storeUrl: storeUrl || null,
     plan: plan,
+    source: campaignParams.source,
+    utm_source: campaignParams.utm_source,
+    utm_medium: campaignParams.utm_medium,
+    utm_campaign: campaignParams.utm_campaign,
     timestamp: new Date().toISOString(),
     userAgent: navigator.userAgent
   };
@@ -184,7 +225,7 @@ async function handleFormSubmit(form, messageEl, submitBtn) {
     }
 
     // Success response
-    trackEvent("signup_success", { plan, hasStoreUrl: Boolean(storeUrl) });
+    trackEvent("signup_success", { plan, source: campaignParams.source, hasStoreUrl: Boolean(storeUrl) });
     messageEl.className = "form-message success";
     if (plan === "None") {
       messageEl.innerHTML = `<strong>You're on the early list!</strong><br>We'll notify you as soon as FileFerry is ready.`;
